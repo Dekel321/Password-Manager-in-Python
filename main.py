@@ -1,6 +1,29 @@
 from pathlib import Path
+import json
 
-location = "C:/Users/Dekel/Documents/Visual Studio project/python project/Passwords"
+def read_location():
+    with open('settings.json', 'r') as file:
+        settings = json.load(file) 
+        return settings['location']
+
+
+location = read_location()
+
+def typecheck(path_to_file):
+
+    file_path = Path(path_to_file)
+    file_type = file_path.suffix
+
+    print(file_type)
+    if '.' in file_type and not file_type == ".txt":
+        t_or_f = 2
+        
+    elif file_type == ".txt":
+        t_or_f = 1
+
+    return t_or_f
+
+
 
 def num1():
     
@@ -15,11 +38,11 @@ def num1():
     account = input("What Nickname Would You Give This Acc: ")
     com_path_to = Path(com_path_one) / (account)
 
-    d_type = typecheck(com_path_to)
+    t_or_f = typecheck(com_path_to)
     
-    if  d_type == True:
+    if  t_or_f == 1:
         com_path_to = str(com_path_to)  + ".txt"       
-    elif d_type == False:
+    elif t_or_f == 2:
         print("Cant Save Your Passwords In That File Type \nOR \nCant End With '.' In The Last 3 Letters")
         exit()  
     else:
@@ -41,12 +64,32 @@ def num2():
     
     open_file = input("Witch File Would You Like To Open: ")
     the_path = Path(location) / (open_file)
+    
+    if the_path.is_dir():
+        pass
+    else:
+        print( "'"+open_file +"'"  + " Doesnt Exist")
+
+    file_type = the_path.suffix
+    if file_type == '.txt':
+        the_path = Path(location) / (open_file)
+        pass
+    else:
+        files_dir = list_files(Path(location) / (open_file))
+
+        for file_name in files_dir:
+            print(file_name) 
+
+        open_again = input("Witch File Would You Like To Open: ")
+        the_path = Path(location) / (open_again)
+        print(the_path)
+
 
     #check type
-    d_type = typecheck(the_path)
-    if d_type == True:
+    t_or_f = typecheck(the_path)
+    if t_or_f == 1:
         the_path = str(the_path)  + ".txt"
-    elif d_type == False:
+    elif t_or_f == 2:
         print("file is not .txt")
         exit()
 
@@ -97,21 +140,6 @@ def list_files(directory):
     
     return file_list
 
-def typecheck(path_to_file):
-    t_or_f = True
-    file_path = Path(path_to_file)
-    file_type = file_path.suffix
-    print(file_type)
-    if '.' in file_type and not file_type == ".txt":
-
-        t_or_f = False
-        
-    elif file_type == ".txt":
-        t_or_f = True
-
-    return t_or_f
-
-  
 
 print("1 Save: \n2 Read: \n3 Change:")
 option = 0
@@ -121,7 +149,4 @@ while not option == 1 or option == 2 or option == 3:
         opt(option)
     except ValueError:
         print("Cant Use Words")
-
-        
-        
 
