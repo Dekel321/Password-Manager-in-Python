@@ -6,119 +6,141 @@ def read_location():
         settings = json.load(file) 
         return settings['location']
 
-
 location = read_location()
 
-def typecheck(path_to_file):
 
-    file_path = Path(path_to_file)
-    file_type = file_path.suffix
-
-    print(file_type)
-    if '.' in file_type and not file_type == ".txt":
-        t_or_f = 2
-        
-    elif file_type == ".txt":
-        t_or_f = 1
-
-    return t_or_f
-
-
-
-def num1():
+def create_password():
     
     folder_name = input("What Is This Password For: ")
-    com_path_one = Path(location) / (folder_name)
-    if com_path_one.exists():
+    combined_one = Path(location) / (folder_name)
+    if combined_one.exists():
         pass
     else: 
         create_file(Path(location) / (folder_name))
         print("created")
 
-    account = input("What Nickname Would You Give This Acc: ")
-    com_path_to = Path(com_path_one) / (account)
+    account_file = input("What Nickname Would You Give This Acc: ")
+    combined_to = Path(combined_one) / (account_file)
 
-    t_or_f = typecheck(com_path_to)
+    t_or_f = is_txt_file(combined_to)
+
+    if t_or_f == 1:
+        pass
+
+    elif t_or_f == 2: 
+        combined_to = str(combined_to)  + ".txt"
+    elif t_or_f == 3:
+        print("File Type Error")
+        exit()
+    elif t_or_f == 4:
+        print("error in code 001")
+
     
-    if  t_or_f == 1:
-        com_path_to = str(com_path_to)  + ".txt"       
-    elif t_or_f == 2:
-        print("Cant Save Your Passwords In That File Type \nOR \nCant End With '.' In The Last 3 Letters")
-        exit()  
-    else:
-        print("some error just fix me")
-    
-    fread = open(com_path_to, "w")
+    file_read = open(combined_to, "w")
     Username = input("Enter Username: ")
     Password = input("Enter Password: ")
-    fread.write(Username + "\n" + Password)
+    file_read.write(Username + "\n" + Password)
 
-    fread.close()  
-
-
-def num2():
-    files_dir = list_files(location)
-
-    for file_name in files_dir:
-        print(file_name) 
-    
-    open_file = input("Witch File Would You Like To Open: ")
-    the_path = Path(location) / (open_file)
-    
-    if the_path.is_dir():
-        pass
-    else:
-        print( "'"+open_file +"'"  + " Doesnt Exist")
-
-    file_type = the_path.suffix
-    if file_type == '.txt':
-        the_path = Path(location) / (open_file)
-        pass
-    else:
-        files_dir = list_files(Path(location) / (open_file))
-
-        for file_name in files_dir:
-            print(file_name) 
-
-        open_again = input("Witch File Would You Like To Open: ")
-        the_path = Path(location) / (open_again)
-        print(the_path)
+    file_read.close()  
 
 
-    #check type
-    t_or_f = typecheck(the_path)
+def read_password():
+    main_path = file_manage()
+    t_or_f = is_txt_file(main_path)
     if t_or_f == 1:
-        the_path = str(the_path)  + ".txt"
-    elif t_or_f == 2:
-        print("file is not .txt")
+        pass
+
+    elif t_or_f == 2: 
+        main_path = str(main_path) +".txt"
+    elif t_or_f == 3:
+        print("File Type Error")
         exit()
+    elif t_or_f == 4:
+        print("error in code 001")
 
     try:
-        with open(the_path, "r") as file:
-            file_contents = file.read()
-            print(file_contents)
-            exit()
+        read_file = open(main_path, "r")
+        file_contents = read_file.read()
+        print(file_contents)
+        read_file.close()
+    except FileNotFoundError as e:
+        print(f"Error: File '{main_path}' not found. \n {e}")
     except Exception as e:
         print(f"Error: {e}")
     
 
-def num3():
-    print("changed")
+def change_password():
+    print("1 Change Username: \n2 Change Password: ")
+    change_option = 0
+    while not change_option == 1 or 2:
+        try:
+            change_option = int(input("|=> ", ))
+            if change_option == 1:
+                change_user()
+            elif change_option == 2:
+                change_pass()
+            else:
+                print("Only Use Numbers 1 - 2")    
+        except ValueError:
+            print("Cant Use Words")
+
+
+def list_and_open(value, write_value):
+    main_path = file_manage()
+
+    t_or_f = is_txt_file(main_path)
+    if t_or_f == 1:
+        pass
+    elif t_or_f == 2: 
+        main_path = str(main_path) +".txt"
+    elif t_or_f == 3:
+        print("File Type Error")
+        exit()
+    elif t_or_f == 4:
+        print("error in code 001")
+
+    try:
+        with open(main_path, "r") as file:
+            lines = file.readlines()
+
+        if len(lines) >= 2:
+            lines[int(value)] = write_value
+        else:
+            pass
+                
+        with open(main_path, "w") as file:
+
+            file.writelines(lines)
+
+    except FileNotFoundError as e:
+        print(f"Error: File '{main_path}' not found. \n {e}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+def change_user():
+    value = 0
+    write_value = input("Pick New Username: ")
+    list_and_open(value, write_value)
+    
+
+def change_pass():
+    value = 1
+    write_value = input("Pick New Password: ")
+    list_and_open(value, write_value)
 
 def opt(option):
     if option == 1:
-        num1()
+        create_password()
     elif option == 2:
-        num2()
+        read_password()
     elif option == 3:
-        num3()
+        change_password()
     else:
         print("Only Use Numbers 1 - 3")
 
-
-def create_file(folder):
+def create_file(make_file_in):
     try:
-        Path(folder).mkdir()
+        Path(make_file_in).mkdir()
 
     except FileExistsError:
         pass
@@ -127,7 +149,7 @@ def create_file(folder):
         exit()
 
 
-def list_files(directory):
+def list_files_in_directory(directory):
     file_list = []  
     try:
         files = Path(directory).glob("*")
@@ -140,13 +162,58 @@ def list_files(directory):
     
     return file_list
 
+def file_manage():
+    file_directory = list_files_in_directory(location)
+
+    for file_name in file_directory:
+        print(file_name) 
+    
+    open_file = input("Witch File Would You Like To Open: ")
+    main_path = Path(location) / (open_file)
+    
+    if main_path.is_dir():
+        pass
+    else:
+        print( "'"+open_file +"'"  + " Doesnt Exist")
+
+
+    if main_path.suffix == '.txt':
+        main_path = Path(location) / (open_file)
+        pass
+    elif main_path.suffix == '':
+        file_directory = list_files_in_directory(Path(location) / (open_file))
+
+        for file_name in file_directory:
+            print(file_name)
+
+        open_file_2nd = input("Witch File Would You Like To Open: ")
+        main_path = Path(location) / (open_file) / (open_file_2nd)
+        return main_path
+    
+def is_txt_file(path_to_file):
+    t_or_f = 4
+    file_path = Path(path_to_file)
+    value = file_path.suffix
+    if value == ".txt":
+        t_or_f = 1
+
+    elif value == '':
+        print(file_path.suffix)
+        t_or_f = 2
+      
+    elif len(value) > 0:
+        print(file_path.suffix)
+        t_or_f = 3
+    else:
+        print("error in code 1")
+
+    return t_or_f
 
 print("1 Save: \n2 Read: \n3 Change:")
 option = 0
-while not option == 1 or option == 2 or option == 3:    
+while not option == 1 or 2 or 3:    
     try:
         option = int(input("|=> ", ))
         opt(option)
     except ValueError:
         print("Cant Use Words")
-
